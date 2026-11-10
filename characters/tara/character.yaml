@@ -1,0 +1,56 @@
+# CastLock character pack: Tara
+# The contract the pipeline enforces for this character. See docs/character-rules.md.
+
+name: Tara
+version: 1
+locked: true
+
+# Face generation policy. For a locked character this must stay "forbidden";
+# pipeline/validate_pack.py fails validation if it is changed.
+lora: forbidden
+face_generation: forbidden
+
+reference:
+  # The only permitted face source for this character. Real approved still,
+  # never model-generated. See reference/README.md.
+  still: reference/tara-founder-face-reference.png
+  extra_stills: []
+
+voice:
+  engine: kokoro-onnx
+  # Tara's narration voice is a placeholder pick pending the owner's final
+  # voice decision; am_michael is the CastLock default narrator.
+  id: am_michael
+  speed: 1.0
+
+seeds:
+  # Registry of known-good seeds per shot type. Add an entry when a shot is
+  # accepted, so it can be reproduced exactly.
+  character_closeup: null
+  character_medium: null
+  scene: null
+
+motion:
+  source: image-to-video from reference stills only
+  camera: fixed
+  permitted:
+    - fixed camera
+    - subtle motion
+    - breathing
+    - blink
+    - slight head turn
+    - background parallax
+  forbidden:
+    - camera orbit
+    - large head turn
+    - scene relighting
+    - text-to-video of the character
+    - any new angle of the face
+  clip_seconds:
+    min: 2
+    max: 5
+  prompt_rule: motion only, never describe appearance
+
+review:
+  frame_check_required: true
+  reject_if: face differs from the reference still
