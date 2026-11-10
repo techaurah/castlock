@@ -1,0 +1,45 @@
+# CastLock character pack template.
+# Copy this folder to characters/<name>/ and fill in every field.
+# See docs/character-rules.md for what each field means and what is allowed.
+
+name: ""
+version: 1
+
+# locked: true means a real person (or approved design) whose face is an
+# asset, not a generation target. Locked packs must keep lora: forbidden
+# and face_generation: forbidden; validation fails otherwise.
+locked: false
+lora: allowed
+face_generation: allowed
+
+reference:
+  still: reference/reference.png
+  extra_stills: []
+
+voice:
+  engine: kokoro-onnx
+  id: am_michael
+  speed: 1.0
+
+seeds:
+  character_closeup: null
+  character_medium: null
+  scene: null
+
+motion:
+  source: image-to-video from reference stills only
+  camera: fixed
+  permitted:
+    - fixed camera
+    - subtle motion
+  forbidden:
+    - camera orbit
+    - large head turn
+  clip_seconds:
+    min: 2
+    max: 5
+  prompt_rule: motion only, never describe appearance
+
+review:
+  frame_check_required: true
+  reject_if: face differs from the reference still
