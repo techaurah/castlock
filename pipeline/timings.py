@@ -23,15 +23,30 @@ from pathlib import Path
 
 
 def audio_duration(path: Path) -> float:
-    """Duration in seconds via ffprobe."""
-    out = subprocess.run(
-        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
-         "-of", "json", str(path)],
-        capture_output=True, text=True,
-    )
-    if out.returncode != 0:
-        raise RuntimeError(f"ffprobe failed on {path}: {out.stderr.strip()}")
-    return float(json.loads(out.stdout)["format"]["duration"])
+    """Duration in seconds.
+
+    Prefers ffprobe. When ffprobe is not installed (minimal CI runners,
+    small containers), WAV files are measured with the stdlib wave module
+    instead, so the estimation fallback never hard-depends on ffprobe for
+    the pipeline's own narration format.
+    """
+    try:
+        out = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "json", str(path)],
+            capture_output=True, text=True,
+        )
+        if out.returncode == 0:
+            return float(json.loads(out.stdout)["format"]["duration"])
+        ffprobe_error = out.stderr.strip()
+    except FileNotFoundError:
+        ffprobe_error = "ffprobe not installed"
+    if path.suffix.lower() == ".wav":
+        import wave
+
+        with wave.open(str(path), "rb") as wav:
+            return wav.getnframes() / float(wav.getframerate())
+    raise RuntimeError(f"ffprobe failed on {path}: {ffprobe_error}")
 
 
 def estimate_timings(text: str, duration: float) -> list[dict]:
