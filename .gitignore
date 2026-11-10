@@ -1,0 +1,24 @@
+# Build output
+build/
+out/
+*.wav
+*.mp4
+*.ass
+!examples/**
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Model files (never commit weights)
+*.onnx
+*.bin
+*.safetensors
+*.gguf
+
+# OS / editor
+.DS_Store
+*.swp
